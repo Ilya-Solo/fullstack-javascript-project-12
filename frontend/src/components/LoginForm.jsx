@@ -1,5 +1,10 @@
+/* eslint-disable jsx-a11y/label-has-associated-control */
+/* eslint-disable functional/no-expression-statement */
+
 import React from 'react';
-import { Formik, Form, Field, ErrorMessage } from 'formik';
+import {
+  Formik, Form, Field, ErrorMessage,
+} from 'formik';
 import * as Yup from 'yup';
 
 const LoginForm = () => {
@@ -14,7 +19,7 @@ const LoginForm = () => {
   });
 
   const onSubmit = (values, { setSubmitting }) => {
-    console.log('Form data', values);
+    console.log(values);
     setSubmitting(false);
   };
 
