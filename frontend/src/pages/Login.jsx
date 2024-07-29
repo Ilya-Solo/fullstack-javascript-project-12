@@ -1,5 +1,5 @@
-import React from 'react';
-import LoginForm from '../components/LoginForm';
+import React from "react";
+import LoginForm from "../components/LoginForm";
 
 const Login = () => (
   <div className="container-fluid h-100">
@@ -8,19 +8,13 @@ const Login = () => (
         <div className="card shadow-sm">
           <div className="card-body row p-5">
             <div className="col-12 col-md-6 d-flex align-items-center justify-content-center">
-              <img
-                src=""
-                className="rounded-circle"
-                alt="Войти"
-              />
+              <img src="" className="rounded-circle" alt="Войти" />
             </div>
             <LoginForm />
           </div>
           <div className="card-footer p-4">
             <div className="text-center">
-              <span>Нет аккаунта?</span>
-              {' '}
-              <a href="/signup">Регистрация</a>
+              <span>Нет аккаунта?</span> <a href="/signup">Регистрация</a>
             </div>
           </div>
         </div>

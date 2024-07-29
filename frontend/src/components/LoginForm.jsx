@@ -1,25 +1,37 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 /* eslint-disable functional/no-expression-statement */
 
-import React from 'react';
-import {
-  Formik, Form, Field, ErrorMessage,
-} from 'formik';
-import * as Yup from 'yup';
+import React from "react";
+import axios from "axios";
+import { Formik, Form, Field } from "formik";
+import { useNavigate } from "react-router-dom";
+
+const CustomErrorMessage = () => (
+  <div className="invalid-tooltip">Неверные имя пользователя или пароль</div>
+);
 
 const LoginForm = () => {
+  const navigate = useNavigate();
+
   const initialValues = {
-    username: '',
-    password: '',
+    username: "",
+    password: "",
   };
 
-  const validationSchema = Yup.object({
-    username: Yup.string().required('Required'),
-    password: Yup.string().required('Required'),
-  });
-
-  const onSubmit = (values, { setSubmitting }) => {
-    console.log(values);
+  const onSubmit = async (values, { setSubmitting, setErrors }) => {
+    await axios
+      .post("/api/v1/login", values)
+      .then((response) => {
+        console.log(response.data);
+        return response.data;
+      })
+      .then((data) => {
+        localStorage.setItem("userData", JSON.stringify(data));
+        navigate("/");
+      })
+      .catch(() => {
+        setErrors({ serverError: "Invalid username or password" });
+      });
     setSubmitting(false);
   };
 
@@ -28,12 +40,8 @@ const LoginForm = () => {
       <div className="row justify-content-center align-content-center h-100">
         <div className="col-12 col-md-6 mt-3 mt-md-0">
           <h1 className="text-center mb-4">Войти</h1>
-          <Formik
-            initialValues={initialValues}
-            validationSchema={validationSchema}
-            onSubmit={onSubmit}
-          >
-            {({ isSubmitting }) => (
+          <Formik initialValues={initialValues} onSubmit={onSubmit}>
+            {({ isSubmitting, errors }) => (
               <Form>
                 <div className="form-floating mb-3">
                   <Field
@@ -46,7 +54,6 @@ const LoginForm = () => {
                     className="form-control"
                   />
                   <label htmlFor="username">Ваш ник</label>
-                  <ErrorMessage name="username" component="div" className="text-danger" />
                 </div>
                 <div className="form-floating mb-4">
                   <Field
@@ -58,10 +65,16 @@ const LoginForm = () => {
                     id="password"
                     className="form-control"
                   />
-                  <label className="form-label" htmlFor="password">Пароль</label>
-                  <ErrorMessage name="password" component="div" className="text-danger" />
+                  <label className="form-label" htmlFor="password">
+                    Пароль
+                  </label>
+                  {errors.serverError && <CustomErrorMessage />}
                 </div>
-                <button type="submit" className="w-100 mb-3 btn btn-outline-primary" disabled={isSubmitting}>
+                <button
+                  type="submit"
+                  className="w-100 mb-3 btn btn-outline-primary"
+                  disabled={isSubmitting}
+                >
                   Войти
                 </button>
               </Form>
