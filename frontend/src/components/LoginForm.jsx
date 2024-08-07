@@ -5,6 +5,8 @@ import React from "react";
 import axios from "axios";
 import { Formik, Form, Field } from "formik";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { setCredentials } from "../slices/authSlice";
 
 const CustomErrorMessage = () => (
   <div className="invalid-tooltip">Неверные имя пользователя или пароль</div>
@@ -12,6 +14,7 @@ const CustomErrorMessage = () => (
 
 const LoginForm = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const initialValues = {
     username: "",
@@ -22,11 +25,8 @@ const LoginForm = () => {
     await axios
       .post("/api/v1/login", values)
       .then((response) => {
-        console.log(response.data);
-        return response.data;
-      })
-      .then((data) => {
-        localStorage.setItem("userData", JSON.stringify(data));
+        const { user, token } = response.data;
+        dispatch(setCredentials({ user, token }));
         navigate("/");
       })
       .catch(() => {

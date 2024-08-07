@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 const Navbar = () => (
   <nav className="shadow-sm navbar navbar-expand-lg navbar-light bg-white">
