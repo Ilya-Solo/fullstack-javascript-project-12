@@ -3,21 +3,25 @@ import axios from "axios";
 import { useSelector, useDispatch } from "react-redux";
 import { setChannels } from "../slices/channelsSlice";
 
-const ChannelList = ({ channels }) => (
-  <ul
-    id="channels-box"
-    className="nav flex-column nav-pills nav-fill px-2 mb-3 overflow-auto h-100 d-block"
-  >
-    {channels.map((channel) => (
-      <li className="nav-item w-100" key={channel.id}>
-        <button type="button" className="w-100 rounded-0 text-start btn">
-          <span className="me-1">#</span>
-          {channel.name}
-        </button>
-      </li>
-    ))}
-  </ul>
-);
+const ChannelList = ({ channels }) => {
+  const channelArray = Object.values(channels); // Преобразование объекта каналов в массив
+
+  return (
+    <ul
+      id="channels-box"
+      className="nav flex-column nav-pills nav-fill px-2 mb-3 overflow-auto h-100 d-block"
+    >
+      {channelArray.map((channel) => (
+        <li className="nav-item w-100" key={channel.id}>
+          <button type="button" className="w-100 rounded-0 text-start btn">
+            <span className="me-1">#</span>
+            {channel.name}
+          </button>
+        </li>
+      ))}
+    </ul>
+  );
+};
 
 const MessageInput = () => (
   <form noValidate className="py-1 border rounded-2">
@@ -59,7 +63,6 @@ const Home = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log(response);
       dispatch(setChannels(response.data));
     } catch (error) {
       console.error("Error fetching channels", error);
@@ -69,6 +72,10 @@ const Home = () => {
   useEffect(() => {
     fetchChannels();
   }, [fetchChannels]);
+
+  if (!channels) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="container h-100 my-4 overflow-hidden rounded shadow">

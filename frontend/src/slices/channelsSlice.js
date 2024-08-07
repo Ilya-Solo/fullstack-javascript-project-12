@@ -1,11 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-const token = localStorage.getItem("token");
-const user = localStorage.getItem("user");
-
 const initialState = {
-  user,
-  token,
+  channels: {},
+  activeChannelId: '',
 };
 
 const slice = createSlice({
@@ -13,9 +10,10 @@ const slice = createSlice({
   initialState,
   reducers: {
     setChannels: (state, { payload: channels }) => {
-      channels.forEach(channel => {
-        state.channels[channel.name] = channel;
-      });
+      state.channels = channels.reduce((acc, channel) => {
+        acc[channel.id] = channel;
+        return acc;
+      }, {});
     },
   },
 });
@@ -23,5 +21,3 @@ const slice = createSlice({
 export const { setChannels } = slice.actions;
 
 export default slice.reducer;
-
-
