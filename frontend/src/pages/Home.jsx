@@ -4,12 +4,20 @@ import Navbar from "../components/Header";
 import ChannelsModule from "../components/ChannelsModule";
 import MessagesModule from "../components/MessagesModule";
 import { connectSocket } from "../slices/messagesSlice";
+import socket from "../slices/initializeSocket";
 
 const Home = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
     dispatch(connectSocket());
+
+    return () => {
+      socket.off("connect");
+      socket.off("newMessage");
+      socket.off("disconnect");
+      socket.off("error");
+    };
   }, [dispatch]);
 
   return (
