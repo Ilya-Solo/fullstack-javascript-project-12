@@ -135,17 +135,6 @@ const slice = createSlice({
         state.status = "failed";
         state.error = payload;
       })
-      .addCase(addChannelReqPost.fulfilled, () => {
-        // slice.caseReducers.addChannel(state, { payload });
-      })
-      .addCase(updateChannel.fulfilled, (state, { payload }) => {
-        slice.caseReducers.renameChannel(state, {
-          payload: { id: payload.id, name: payload.name },
-        });
-      })
-      .addCase(deleteChannel.fulfilled, (state, { payload: id }) => {
-        slice.caseReducers.removeChannel(state, { payload: id });
-      });
   },
 });
 
@@ -165,3 +154,7 @@ export const getChannelsInfo = (state) => state.channels;
 export const getChannelName = (state, activeChannelId) => {
   return state.channels.channels[activeChannelId]?.name || "";
 };
+
+export const channelUniqnessCheck = (channels, newChannelName) => {
+  return !Object.values(channels.channels).some(channel => channel.name === newChannelName);
+}
