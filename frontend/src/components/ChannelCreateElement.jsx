@@ -26,7 +26,7 @@ const ChannelCreateElement = () => {
       .max(20, "Имя должно содержать не более 20 символов")
       .required("Имя канала обязательно")
       .test("unique-channel", "Должно быть уникальным", (value) =>
-        channelUniqnessCheck(channels, value)
+        channelUniqnessCheck(channels, value),
       ),
   });
 

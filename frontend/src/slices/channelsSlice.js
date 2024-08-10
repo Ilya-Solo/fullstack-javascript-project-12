@@ -1,10 +1,13 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import socket from "./initializeSocket";
+import { deleteChannelFromMessages } from "./messagesSlice";
+
+const defaultActiveChannelId = "1";
 
 const initialState = {
   channels: {},
-  activeChannelId: "1",
+  activeChannelId: defaultActiveChannelId,
   socketStatus: "disconnected",
   status: "idle",
   error: null,
@@ -68,13 +71,14 @@ export const updateChannel = createAsyncThunk(
 
 export const deleteChannel = createAsyncThunk(
   "channels/deleteChannel",
-  async ({ id, token }, { rejectWithValue }) => {
+  async ({ id, token }, { rejectWithValue, dispatch }) => {
     try {
       await axios.delete(`/api/v1/channels/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
+      dispatch(deleteChannelFromMessages({ id }));
       return id;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -90,6 +94,7 @@ export const connectChannelsSocket = createAsyncThunk(
     });
 
     socket.on("removeChannel", (payload) => {
+      dispatch(deleteChannelFromMessages(payload));
       dispatch(removeChannel(payload));
     });
 
@@ -112,13 +117,18 @@ const slice = createSlice({
     addChannel: (state, { payload: channel }) => {
       state.channels[channel.id] = channel;
     },
-    removeChannel: (state, { payload: id }) => {
-      delete state.channels[id];
+    removeChannel: (state, { payload: { id } }) => {
+      if (state.channels[id]) {
+        delete state.channels[id];
+        if (state.activeChannelId === id) {
+          state.activeChannelId = defaultActiveChannelId;
+        }
+      }
     },
     renameChannel: (state, { payload: { id, name } }) => {
       state.channels[id].name = name;
     },
-    setActiveChannel: (state, { payload: id }) => {
+    setActiveChannel: (state, { payload: { id } }) => {
       state.activeChannelId = id;
     },
   },
@@ -135,6 +145,10 @@ const slice = createSlice({
         state.status = "failed";
         state.error = payload;
       })
+      .addCase(addChannelReqPost.fulfilled, (state, { payload }) => {
+        slice.caseReducers.addChannel(state, { payload });
+        slice.caseReducers.setActiveChannel(state, { payload });
+      });
   },
 });
 
@@ -154,7 +168,8 @@ export const getChannelsInfo = (state) => state.channels;
 export const getChannelName = (state, activeChannelId) => {
   return state.channels.channels[activeChannelId]?.name || "";
 };
-
 export const channelUniqnessCheck = (channels, newChannelName) => {
-  return !Object.values(channels.channels).some(channel => channel.name === newChannelName);
-}
+  return !Object.values(channels.channels).some(
+    (channel) => channel.name === newChannelName,
+  );
+};

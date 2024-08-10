@@ -99,6 +99,12 @@ const slice = createSlice({
         }
       }
     },
+    deleteChannelFromMessages: (state, { payload }) => {
+      const { channelId } = payload;
+      if (state.messages[channelId]) {
+        delete state.messages[channelId];
+      }
+    },
     socketConnected: (state) => {
       state.socketStatus = "connected";
     },
@@ -142,6 +148,7 @@ export const {
   addMessage,
   removeMessage,
   updateMessage,
+  deleteChannelFromMessages,
   socketConnected,
   socketDisconnected,
 } = slice.actions;
