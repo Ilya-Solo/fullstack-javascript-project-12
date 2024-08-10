@@ -3,16 +3,16 @@ import classNames from "classnames";
 import { useDispatch, useSelector } from "react-redux";
 import {
   setChannelsReqGet,
-  addNewChannel,
-  updateChannel,
-  deleteChannel,
+  // addChannelReqPost,
+  // updateChannel,
+  // deleteChannel,
   connectChannelsSocket,
 } from "../slices/channelsSlice";
 
 const ChannelsList = () => {
   const dispatch = useDispatch();
   const { channels, status, error, activeChannelId } = useSelector(
-    (state) => state.channels
+    (state) => state.channels,
   );
   const token = useSelector((state) => state.auth.token);
 
@@ -28,7 +28,7 @@ const ChannelsList = () => {
   }
 
   if (status === "failed") {
-    return <div>Error: {error}</div>;
+    return <div>Error: {error.message}</div>;
   }
 
   return (

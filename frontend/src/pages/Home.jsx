@@ -1,9 +1,17 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useDispatch } from "react-redux";
 import Navbar from "../components/Header";
 import ChannelsModule from "../components/ChannelsModule";
 import MessagesModule from "../components/MessagesModule";
+import { connectSocket } from "../slices/messagesSlice";
 
 const Home = () => {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(connectSocket());
+  }, [dispatch]);
+
   return (
     <div className="h-100">
       <div className="h-100" id="chat">

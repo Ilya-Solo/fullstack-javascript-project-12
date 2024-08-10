@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
-import io from "socket.io-client";
+import socket from "./initializeSocket";
 
 const initialState = {
   channels: {},
@@ -9,8 +9,6 @@ const initialState = {
   status: "idle",
   error: null,
 };
-
-export const channelsSocket = io("/");
 
 export const setChannelsReqGet = createAsyncThunk(
   "channels/setChannelsReqGet",
@@ -87,24 +85,16 @@ export const deleteChannel = createAsyncThunk(
 export const connectChannelsSocket = createAsyncThunk(
   "channels/connectChannelsSocket",
   async (_, { dispatch }) => {
-    channelsSocket.on("connect", () => {
-      dispatch(socketConnected());
-    });
-
-    channelsSocket.on("newChannel", (payload) => {
+    socket.on("newChannel", (payload) => {
       dispatch(addChannel(payload));
     });
 
-    channelsSocket.on("removeChannel", (payload) => {
+    socket.on("removeChannel", (payload) => {
       dispatch(removeChannel(payload));
     });
 
-    channelsSocket.on("renameChannel", (payload) => {
+    socket.on("renameChannel", (payload) => {
       dispatch(renameChannel(payload));
-    });
-
-    channelsSocket.on("disconnect", () => {
-      dispatch(socketDisconnected());
     });
   },
 );
@@ -131,12 +121,6 @@ const slice = createSlice({
     setActiveChannel: (state, { payload: id }) => {
       state.activeChannelId = id;
     },
-    socketConnected: (state) => {
-      state.socketStatus = "connected";
-    },
-    socketDisconnected: (state) => {
-      state.socketStatus = "disconnected";
-    },
   },
   extraReducers: (builder) => {
     builder
@@ -151,19 +135,16 @@ const slice = createSlice({
         state.status = "failed";
         state.error = payload;
       })
-      .addCase(addChannelReqPost.fulfilled, (state, { payload }) => {
-        slice.caseReducers.addChannel(state, { payload });
+      .addCase(addChannelReqPost.fulfilled, () => {
+        // slice.caseReducers.addChannel(state, { payload });
       })
       .addCase(updateChannel.fulfilled, (state, { payload }) => {
         slice.caseReducers.renameChannel(state, {
           payload: { id: payload.id, name: payload.name },
-        }); // Используем renameChannel
+        });
       })
       .addCase(deleteChannel.fulfilled, (state, { payload: id }) => {
         slice.caseReducers.removeChannel(state, { payload: id });
-      })
-      .addCase(connectChannelsSocket.fulfilled, (state) => {
-        slice.caseReducers.socketConnected(state);
       });
   },
 });
@@ -181,6 +162,6 @@ export const {
 export default slice.reducer;
 
 export const getChannelsInfo = (state) => state.channels;
-export const getChannelName = (state, activeChannelId) =>{
+export const getChannelName = (state, activeChannelId) => {
   return state.channels.channels[activeChannelId]?.name || "";
-}
+};

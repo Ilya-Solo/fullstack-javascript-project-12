@@ -11,9 +11,8 @@ const MessageSchema = Yup.object().shape({
 
 const MessageInput = () => {
   const dispatch = useDispatch();
-  const { activeChannelId } = useSelector((state) => getChannelsInfo(state));
+  const { activeChannelId } = useSelector(getChannelsInfo);
   const { username, token } = useSelector((state) => state.auth);
-  const ms = useSelector((state) => state);
 
   return (
     <div className="mt-auto px-5 py-3">
@@ -21,14 +20,13 @@ const MessageInput = () => {
         initialValues={{ body: "" }}
         validationSchema={MessageSchema}
         onSubmit={(values, { resetForm }) => {
-          console.log(ms);
           dispatch(
             addMessageReqPost({
               ...values,
               channelId: activeChannelId,
               username,
               token,
-            })
+            }),
           );
           resetForm();
         }}

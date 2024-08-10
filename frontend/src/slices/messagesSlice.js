@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
-import io from "socket.io-client";
+import socket from "./initializeSocket";
 
 const initialState = {
   messages: {},
@@ -10,24 +10,22 @@ const initialState = {
   error: null,
 };
 
-export const messagesSocket = io("/");
-
-export const connectMessagesSocket = createAsyncThunk(
+export const connectSocket = createAsyncThunk(
   "messages/connectMessagesSocket",
   async (_, { dispatch }) => {
-    messagesSocket.on("connect", () => {
+    socket.on("connect", () => {
       dispatch(socketConnected());
     });
 
-    messagesSocket.on("newMessage", (payload) => {
+    socket.on("newMessage", (payload) => {
       dispatch(addMessage(payload));
     });
 
-    messagesSocket.on("disconnect", () => {
+    socket.on("disconnect", () => {
       dispatch(socketDisconnected());
     });
 
-    messagesSocket.on("error", () => {
+    socket.on("error", () => {
       dispatch(fetchMessages());
     });
   },
@@ -66,60 +64,24 @@ export const addMessageReqPost = createAsyncThunk(
   },
 );
 
-export const editMessageReqPost = createAsyncThunk(
-  "messages/editMessageReqPost",
-  async ({ id, body, token }, { rejectWithValue }) => {
-    try {
-      const response = await axios.patch(
-        `/api/v1/messages/${id}`,
-        { body },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error.response.data);
-    }
-  },
-);
-
-export const deleteMessageReqPost = createAsyncThunk(
-  "messages/deleteMessageReqPost",
-  async ({ id, token }, { rejectWithValue }) => {
-    try {
-      await axios.delete(`/api/v1/messages/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      return id;
-    } catch (error) {
-      return rejectWithValue(error.response.data);
-    }
-  },
-);
-
 const slice = createSlice({
   name: "messages",
   initialState,
   reducers: {
-    addCurrentMessageText: (state, { payload }) => {
-      const { message } = payload;
-      state.currentMessageText = message;
-    },
-    removeCurrentMessageText: (state) => {
-      state.currentMessageText = "";
-    },
     addMessage: (state, { payload }) => {
       const { channelId } = payload;
+
       if (!state.messages[channelId]) {
         state.messages[channelId] = [];
       }
-      state.messages[channelId].push(payload);
-      state.messages[channelId].sort((m1, m2) => m1.id - m2.id);
+
+      const messagesArray = state.messages[channelId];
+      const exists = messagesArray.some((msg) => msg.id === payload.id);
+      if (!exists) {
+        messagesArray.push(payload);
+      }
+
+      messagesArray.sort((m1, m2) => m1.id - m2.id);
     },
     removeMessage: (state, { payload: { id, channelId } }) => {
       if (state.messages[channelId]) {
@@ -146,37 +108,30 @@ const slice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(connectMessagesSocket.fulfilled, (state) => {
-        state.socketStatus = "connected";
+      .addCase(connectSocket.fulfilled, (state) => {
+        slice.caseReducers.socketConnected(state);
       })
       .addCase(fetchMessages.fulfilled, (state, { payload }) => {
         payload.forEach((message) => {
           const { channelId } = message;
+
           if (!state.messages[channelId]) {
             state.messages[channelId] = [];
           }
-          state.messages[channelId].push(message);
+
+          const messagesArray = state.messages[channelId];
+          const exists = messagesArray.some((msg) => msg.id === message.id);
+          if (!exists) {
+            messagesArray.push(message);
+          }
         });
 
         Object.values(state.messages).forEach((messages) => {
           messages.sort((m1, m2) => m1.id - m2.id);
         });
       })
-      .addCase(addMessageReqPost.fulfilled, (state, { payload }) => {
-        slice.caseReducers.addMessage(state, { payload });
-      })
-      .addCase(editMessageReqPost.fulfilled, (state, { payload }) => {
-        slice.caseReducers.updateMessage(state, { payload });
-      })
-      .addCase(deleteMessageReqPost.fulfilled, (state, { payload: id }) => {
-        const channelId = Object.keys(state.messages).find((channelId) =>
-          state.messages[channelId].some((message) => message.id === id),
-        );
-        if (channelId) {
-          slice.caseReducers.removeMessage(state, {
-            payload: { id, channelId },
-          });
-        }
+      .addCase(addMessageReqPost.fulfilled, () => {
+        // slice.caseReducers.addMessage(state, { payload });
       });
   },
 });
@@ -195,7 +150,13 @@ export default slice.reducer;
 
 export const getMessagesLength = (state, activeChannelId) => {
   return state.messages.messages[activeChannelId]?.length || 0;
-}
+};
 export const getMessages = (state, activeChannelId) => {
   return state.messages?.messages[activeChannelId] || [];
-}
+};
+// export const clearAllMessages = (state) => {
+//   Object.values(state.messages.messages).forEach((channelMessages) => {
+//     // eslint-disable-next-line no-unused-vars
+//     channelMessages = [];
+//   });
+// };

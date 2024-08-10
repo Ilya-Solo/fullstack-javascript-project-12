@@ -5,9 +5,9 @@ import messagesReducer from "./messagesSlice";
 
 const store = configureStore({
   reducer: {
+    messages: messagesReducer,
     auth: authReducer,
     channels: channelsReducer,
-    messages: messagesReducer,
   },
   devTools: process.env.NODE_ENV !== "production",
 });

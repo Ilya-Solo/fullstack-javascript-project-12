@@ -5,7 +5,7 @@ import React from "react";
 import axios from "axios";
 import { Formik, Form, Field } from "formik";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setCredentials } from "../slices/authSlice";
 
 const CustomErrorMessage = () => (
@@ -16,6 +16,8 @@ const LoginForm = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+  const { auth } = useSelector((state) => state);
+
   const initialValues = {
     username: "",
     password: "",
@@ -25,8 +27,11 @@ const LoginForm = () => {
     await axios
       .post("/api/v1/login", values)
       .then((response) => {
-        const { user, token } = response.data;
-        dispatch(setCredentials({ user, token }));
+        const { username, token } = response.data;
+        console.log(username);
+        console.log(token);
+        dispatch(setCredentials({ username, token }));
+        console.log(auth);
         navigate("/");
       })
       .catch(() => {

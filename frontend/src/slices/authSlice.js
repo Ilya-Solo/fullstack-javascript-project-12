@@ -12,11 +12,13 @@ const slice = createSlice({
   name: "auth",
   initialState,
   reducers: {
+    /* eslint-disable no-shadow */
     setCredentials: (state, { payload: { username, token } }) => {
       state.username = username;
       state.token = token;
       localStorage.setItem("username", username);
       localStorage.setItem("token", token);
+      /* eslint-disable no-shadow */
     },
     logout: (state) => {
       state.username = null;
@@ -33,3 +35,5 @@ export default slice.reducer;
 
 export const selectIsAuthenticated = (state) =>
   state.auth.username !== null && state.auth.token !== null;
+
+export const getAuthInfo = (state) => state.auth;

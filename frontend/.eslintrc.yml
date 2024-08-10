@@ -33,6 +33,11 @@ rules:
   functional/no-try-statements: 0
   functional/no-throw-statements: 0
   functional/no-return-void: 0
+  functional/no-expression-statement: 0
+  no-param-reassign: 0
+  functional/no-conditional-statement: 0
+  functional/no-try-statement: 0
+  no-use-before-define: 0
   no-underscore-dangle: [2, { "allow": ["__filename", "__dirname"] }]
   react/function-component-definition:
     [2, { "namedComponents": "arrow-function" }]
