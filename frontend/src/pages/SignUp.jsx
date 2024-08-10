@@ -1,8 +1,8 @@
 import React from "react";
-import LoginForm from "../components/LoginForm";
+import SignUpForm from "../components/SignUpForm";
 import Header from "../components/Header";
 
-const Login = () => (
+const SignUp = () => (
   <>
     <Header />
     <div className="container-fluid h-100">
@@ -17,12 +17,7 @@ const Login = () => (
                   alt="Войти"
                 />
               </div>
-              <LoginForm />
-            </div>
-            <div className="card-footer p-4">
-              <div className="text-center">
-                <span>Нет аккаунта?</span> <a href="/signup">Регистрация</a>
-              </div>
+              <SignUpForm />
             </div>
           </div>
         </div>
@@ -31,4 +26,4 @@ const Login = () => (
   </>
 );
 
-export default Login;
+export default SignUp;

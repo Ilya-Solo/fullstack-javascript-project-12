@@ -1,4 +1,5 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import axios from "axios";
 
 const token = localStorage.getItem("token");
 const username = localStorage.getItem("username");
@@ -7,6 +8,30 @@ const initialState = {
   username,
   token,
 };
+
+export const login = createAsyncThunk(
+  "auth/login",
+  async (values, { rejectWithValue }) => {
+    try {
+      const response = await axios.post("/api/v1/login", values);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  },
+);
+
+export const signUp = createAsyncThunk(
+  "auth/signUp",
+  async (values, { rejectWithValue }) => {
+    try {
+      const response = await axios.post("/api/v1/signup", values);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  },
+);
 
 const slice = createSlice({
   name: "auth",
@@ -26,6 +51,15 @@ const slice = createSlice({
       localStorage.removeItem("username");
       localStorage.removeItem("token");
     },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(login.fulfilled, (state, { payload }) => {
+        slice.caseReducers.setCredentials(state, { payload });
+      })
+      .addCase(signUp.fulfilled, (state, { payload }) => {
+        slice.caseReducers.setCredentials(state, { payload });
+      });
   },
 });
 
