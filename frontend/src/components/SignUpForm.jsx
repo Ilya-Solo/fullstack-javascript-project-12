@@ -1,12 +1,9 @@
 import React from "react";
-import { Formik, Form, Field } from "formik";
+import { Formik, Form, Field, ErrorMessage } from "formik";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
+import * as Yup from "yup";
 import { signUp } from "../slices/authSlice";
-
-const CustomErrorMessage = () => (
-  <div className="invalid-tooltip">Неверные имя пользователя или пароль</div>
-);
 
 const SignUpForm = () => {
   const navigate = useNavigate();
@@ -18,24 +15,41 @@ const SignUpForm = () => {
     passwordConfirmation: "",
   };
 
+  const validationSchema = Yup.object({
+    username: Yup.string()
+      .min(3, "Имя пользователя должно содержать от 3 до 20 символов")
+      .max(20, "Имя пользователя должно содержать от 3 до 20 символов")
+      .required("Имя пользователя обязательно"),
+    password: Yup.string()
+      .min(6, "Пароль должен содержать не менее 6 символов")
+      .required("Пароль обязателен"),
+    passwordConfirmation: Yup.string()
+      .oneOf([Yup.ref("password"), null], "Пароли должны совпадать")
+      .required("Подтверждение пароля обязательно"),
+  });
+
   const onSubmit = async (values, { setSubmitting, setErrors }) => {
     try {
-      await dispatch(signUp(values)).unwrap(); // Ждем завершения регистрации
-      navigate("/"); // Переход после успешной регистрации
+      await dispatch(signUp(values)).unwrap();
+      navigate("/");
     } catch (error) {
       console.log(error);
-      if (error.response && error.statusCode === 409) {
+      if (error.statusCode === 409) {
         setErrors({ serverError: "Пользователь уже существует" });
       } else {
         setErrors({ serverError: "Произошла ошибка. Попробуйте снова." });
       }
     } finally {
-      setSubmitting(false); // Сброс статуса отправки после завершения всех операций
+      setSubmitting(false);
     }
   };
 
   return (
-    <Formik initialValues={initialValues} onSubmit={onSubmit}>
+    <Formik
+      initialValues={initialValues}
+      validationSchema={validationSchema}
+      onSubmit={onSubmit}
+    >
       {({ isSubmitting, errors }) => (
         <Form className="col-12 col-md-6 mt-3 mt-md-0">
           <h1 className="text-center mb-4">Регистрация</h1>
@@ -47,9 +61,14 @@ const SignUpForm = () => {
               required
               placeholder="Имя пользователя"
               id="username"
-              className="form-control"
+              className={`form-control ${errors.username ? "is-invalid" : ""}`}
             />
             <label htmlFor="username">Имя пользователя</label>
+            <ErrorMessage
+              name="username"
+              component="div"
+              className="invalid-tooltip"
+            />
           </div>
           <div className="form-floating mb-4">
             <Field
@@ -59,12 +78,16 @@ const SignUpForm = () => {
               required
               placeholder="Пароль"
               id="password"
-              className="form-control"
+              className={`form-control ${errors.password ? "is-invalid" : ""}`}
             />
             <label className="form-label" htmlFor="password">
               Пароль
             </label>
-            {errors.serverError && <CustomErrorMessage />}
+            <ErrorMessage
+              name="password"
+              component="div"
+              className="invalid-tooltip"
+            />
           </div>
           <div className="form-floating mb-4">
             <Field
@@ -73,13 +96,20 @@ const SignUpForm = () => {
               required
               placeholder="Подтвердите пароль"
               id="passwordConfirmation"
-              className="form-control"
+              className={`form-control ${errors.passwordConfirmation ? "is-invalid" : ""}`}
             />
             <label className="form-label" htmlFor="passwordConfirmation">
               Подтвердите пароль
             </label>
-            {errors.serverError && <CustomErrorMessage />}
+            <ErrorMessage
+              name="passwordConfirmation"
+              component="div"
+              className="invalid-tooltip"
+            />
           </div>
+          {errors.serverError && (
+            <div className="alert alert-danger">{errors.serverError}</div>
+          )}
           <button
             type="submit"
             className="w-100 mb-3 btn btn-outline-primary"

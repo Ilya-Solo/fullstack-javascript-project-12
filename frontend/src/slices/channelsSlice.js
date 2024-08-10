@@ -78,7 +78,7 @@ export const deleteChannel = createAsyncThunk(
           Authorization: `Bearer ${token}`,
         },
       });
-      dispatch(deleteChannelFromMessages({ id }));
+      dispatch(deleteChannelFromMessages({ channelId: id }));
       return id;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -94,7 +94,7 @@ export const connectChannelsSocket = createAsyncThunk(
     });
 
     socket.on("removeChannel", (payload) => {
-      dispatch(deleteChannelFromMessages(payload));
+      dispatch(deleteChannelFromMessages({ channelId: payload.id }));
       dispatch(removeChannel(payload));
     });
 

@@ -1,4 +1,8 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import {
+  createSlice,
+  createAsyncThunk,
+  createSelector,
+} from "@reduxjs/toolkit";
 import axios from "axios";
 import socket from "./initializeSocket";
 
@@ -158,12 +162,12 @@ export default slice.reducer;
 export const getMessagesLength = (state, activeChannelId) => {
   return state.messages.messages[activeChannelId]?.length || 0;
 };
-export const getMessages = (state, activeChannelId) => {
-  return state.messages?.messages[activeChannelId] || [];
-};
-// export const clearAllMessages = (state) => {
-//   Object.values(state.messages.messages).forEach((channelMessages) => {
-//     // eslint-disable-next-line no-unused-vars
-//     channelMessages = [];
-//   });
-// };
+export const getMessages = createSelector(
+  [
+    (state) => state.messages.messages,
+    (_state, activeChannelId) => activeChannelId,
+  ],
+  (messages, activeChannelId) => {
+    return messages[activeChannelId] || [];
+  },
+);
