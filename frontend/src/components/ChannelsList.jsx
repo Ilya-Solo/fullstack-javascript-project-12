@@ -6,6 +6,7 @@ import {
   // addChannelReqPost,
   // updateChannel,
   // deleteChannel,
+  setActiveChannel,
   connectChannelsSocket,
 } from "../slices/channelsSlice";
 
@@ -43,6 +44,9 @@ const ChannelsList = () => {
             className={classNames("w-100", "rounded-0", "text-start", "btn", {
               "btn-secondary": channel.id === activeChannelId,
             })}
+            onClick={() => {
+              dispatch(setActiveChannel(channel.id));
+            }}
           >
             <span className="me-1">#</span>
             {channel.name}
