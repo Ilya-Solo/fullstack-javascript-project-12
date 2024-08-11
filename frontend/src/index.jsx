@@ -3,19 +3,29 @@ import ReactDOM from "react-dom/client";
 import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
-import { Provider } from "react-redux";
+import { Provider as ReduxProvider } from "react-redux";
+import { Provider as RollbarProvider, ErrorBoundary } from "@rollbar/react";
 import store from "./slices/store";
 import i18n from "./locales/initializei18";
 import { I18nextProvider } from "react-i18next";
 
+const rollbarConfig = {
+  accessToken: process.env.REACT_APP_ROLLBAR_ACCESS_TOKEN,
+  environment: process.env.NODE_ENV,
+};
+
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
-    <I18nextProvider i18n={i18n} defaultNS={"translation"}>
-      <Provider store={store}>
-        <App />
-      </Provider>
-    </I18nextProvider>
+    <RollbarProvider config={rollbarConfig}>
+      <ErrorBoundary>
+        <I18nextProvider i18n={i18n} defaultNS={"translation"}>
+          <ReduxProvider store={store}>
+            <App />
+          </ReduxProvider>
+        </I18nextProvider>
+      </ErrorBoundary>
+    </RollbarProvider>
   </React.StrictMode>
 );
 
