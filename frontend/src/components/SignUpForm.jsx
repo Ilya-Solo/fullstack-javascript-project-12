@@ -35,7 +35,6 @@ const SignUpForm = () => {
       await dispatch(signUp(values)).unwrap();
       navigate("/");
     } catch (error) {
-      console.log(error);
       if (error.statusCode === 409) {
         setErrors({ serverError: t("signUp.errors.alreadyExistingUser") });
       } else {
