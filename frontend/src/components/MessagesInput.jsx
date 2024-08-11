@@ -27,13 +27,14 @@ const MessageInput = () => {
             ...values,
             body: leoProfanity.clean(values.body),
           };
+          console.log(cleanedValue);
           dispatch(
             addMessageReqPost({
               ...cleanedValue,
               channelId: activeChannelId,
               username,
               token,
-            })
+            }),
           );
           resetForm();
         }}
