@@ -1,23 +1,26 @@
 import React from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import * as Yup from "yup";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
-import { Formik, Form, Field, ErrorMessage } from "formik";
-import * as Yup from "yup";
 import { useTranslation } from "react-i18next";
-import { ToastContainer, toast } from "react-toastify";
-import { channelUniqnessCheck } from "../slices/channelsSlice";
+import {
+  channelUniqnessCheck,
+  addChannelReqPost,
+} from "../slices/channelsSlice";
+import { getAuthInfo } from "../slices/authSlice";
 
-const ChannelRenameModal = ({
-  show,
-  handleClose,
-  handleRename,
-  initialName,
-}) => {
+const ChannelCreateModal = ({ showModal, handleCloseModal }) => {
   const { t } = useTranslation();
+  const dispatch = useDispatch();
+
   const channels = useSelector((state) => state.channels);
+  const { token } = useSelector(getAuthInfo);
   const notify = () => {
-    toast.success(t("notifications.renameChannel"));
+    toast.success(t("notifications.addChannel"));
   };
 
   const validationSchema = Yup.object({
@@ -34,27 +37,34 @@ const ChannelRenameModal = ({
 
   return (
     <>
-      <Modal show={show} onHide={handleClose}>
+      <Modal show={showModal} onHide={handleCloseModal}>
         <Modal.Header closeButton>
-          <Modal.Title>{t("channels.renameChannel.title")}</Modal.Title>
+          <Modal.Title>{t("channels.addChannelForm.title")}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Formik
-            initialValues={{ name: initialName }}
+            initialValues={{ name: "" }}
             validationSchema={validationSchema}
             onSubmit={(values, { setSubmitting }) => {
               notify();
-              handleRename(values.name);
+              dispatch(addChannelReqPost({ name: values.name, token }));
               setSubmitting(false);
+              handleCloseModal();
             }}
           >
-            {({ isSubmitting, errors, touched }) => (
+            {({ isSubmitting, touched, errors }) => (
               <Form>
-                <div className="mb-2">
+                <div className="form-group">
+                  <label htmlFor="name">
+                    {t("channels.addChannelForm.channelName")}
+                  </label>
                   <Field
                     name="name"
+                    type="text"
                     id="name"
-                    className={`form-control ${touched.name && errors.name ? "is-invalid" : ""}`}
+                    className={`form-control ${
+                      errors.name && touched.name ? "is-invalid" : ""
+                    }`}
                   />
                   <ErrorMessage
                     name="name"
@@ -62,11 +72,11 @@ const ChannelRenameModal = ({
                     className="invalid-feedback"
                   />
                 </div>
-                <div className="d-flex justify-content-end">
+                <div className="d-flex justify-content-end mt-3">
                   <Button
                     variant="secondary"
+                    onClick={handleCloseModal}
                     className="me-2"
-                    onClick={handleClose}
                   >
                     {t("formCommonFields.cancel")}
                   </Button>
@@ -88,4 +98,4 @@ const ChannelRenameModal = ({
   );
 };
 
-export default ChannelRenameModal;
+export default ChannelCreateModal;

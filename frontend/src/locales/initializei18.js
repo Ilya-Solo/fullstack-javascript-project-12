@@ -4,8 +4,8 @@ import resources from "./index";
 
 i18n.use(initReactI18next).init({
   resources,
-  fallbackLng: "en",
-  debug: false,
+  fallbackLng: "ru",
+  debug: true,
   interpolation: {
     escapeValue: false,
   },

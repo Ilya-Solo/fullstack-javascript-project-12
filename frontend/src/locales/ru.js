@@ -63,5 +63,10 @@ export default {
         },
       },
     },
+    notifications: {
+      renameChannel: "Канал переименован",
+      addChannel: "Канал создан",
+      removeChannel: "Канал удален",
+    },
   },
 };
