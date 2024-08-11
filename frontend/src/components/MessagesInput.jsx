@@ -33,7 +33,7 @@ const MessageInput = () => {
               channelId: activeChannelId,
               username,
               token,
-            }),
+            })
           );
           resetForm();
         }}
