@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useRef } from "react";
 import classNames from "classnames";
 import { useDispatch, useSelector } from "react-redux";
+import { useTranslation } from "react-i18next";
 import { deleteChannel, updateChannel } from "../slices/channelsSlice";
 import ChannelDeleteModal from "./ChannelDeleteModal";
 import ChannelRenameModal from "./ChannelRenameModal";
 import { getAuthInfo } from "../slices/authSlice";
 
 const ChannelsListItemControl = ({ channel, activeChannelId }) => {
+  const { t } = useTranslation();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showRenameModal, setShowRenameModal] = useState(false);
@@ -67,7 +69,7 @@ const ChannelsListItemControl = ({ channel, activeChannelId }) => {
         onClick={toggleDropdown}
         aria-expanded={dropdownOpen}
       >
-        <span className="visually-hidden">Управление каналом</span>
+        <span className="visually-hidden">{t("channels.control")}</span>
       </button>
       {dropdownOpen && (
         <div
@@ -89,7 +91,7 @@ const ChannelsListItemControl = ({ channel, activeChannelId }) => {
               setShowDeleteModal(true);
             }}
           >
-            Удалить
+            {t("formCommonFields.delete")}
           </a>
           <a
             className="dropdown-item"
@@ -99,7 +101,7 @@ const ChannelsListItemControl = ({ channel, activeChannelId }) => {
               setShowRenameModal(true);
             }}
           >
-            Переименовать
+            {t("formCommonFields.rename")}
           </a>
         </div>
       )}

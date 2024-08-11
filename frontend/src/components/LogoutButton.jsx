@@ -1,8 +1,10 @@
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { logout } from "../slices/authSlice";
 
 const LogoutButton = () => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -13,7 +15,7 @@ const LogoutButton = () => {
 
   return (
     <button type="button" className="btn btn-primary" onClick={handleLogout}>
-      Выйти
+      {t("login.exit")}
     </button>
   );
 };

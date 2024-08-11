@@ -11,7 +11,7 @@ import ChannelsListItem from "./ChannelsListItem";
 
 const ChannelsList = () => {
   const dispatch = useDispatch();
-  const { channels, status, error } = useSelector((state) => state.channels);
+  const { channels } = useSelector((state) => state.channels);
   const token = useSelector((state) => state.auth.token);
 
   useEffect(() => {
@@ -20,14 +20,6 @@ const ChannelsList = () => {
   }, [dispatch, token]);
 
   const channelArray = Object.values(channels);
-
-  if (status === "loading") {
-    return <div>Loading...</div>;
-  }
-
-  if (status === "failed") {
-    return <div>Error: {error.message}</div>;
-  }
 
   return (
     <ul

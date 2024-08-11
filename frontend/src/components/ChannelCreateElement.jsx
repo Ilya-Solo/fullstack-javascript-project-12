@@ -4,6 +4,7 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
+import { useTranslation } from "react-i18next";
 import {
   channelUniqnessCheck,
   addChannelReqPost,
@@ -11,6 +12,7 @@ import {
 import { getAuthInfo } from "../slices/authSlice";
 
 const ChannelCreateElement = () => {
+  const { t } = useTranslation();
   const [showModal, setShowModal] = useState(false);
   const handleOpenModal = () => setShowModal(true);
   const handleCloseModal = () => setShowModal(false);
@@ -22,18 +24,20 @@ const ChannelCreateElement = () => {
 
   const validationSchema = Yup.object({
     name: Yup.string()
-      .min(3, "Имя должно содержать не менее 3 символов")
-      .max(20, "Имя должно содержать не более 20 символов")
-      .required("Имя канала обязательно")
-      .test("unique-channel", "Должно быть уникальным", (value) =>
-        channelUniqnessCheck(channels, value),
+      .min(3, t("channels.addChannelForm.errors.wrongUsernameSize"))
+      .max(20, t("channels.addChannelForm.errors.wrongUsernameSize"))
+      .required(t("channels.addChannelForm.errors.channelNameRequired"))
+      .test(
+        "unique-channel",
+        t("channels.addChannelForm.errors.mustBeUniq"),
+        (value) => channelUniqnessCheck(channels, value),
       ),
   });
 
   return (
     <>
       <div className="d-flex mt-1 justify-content-between mb-2 ps-4 pe-2 p-4">
-        <b>Каналы</b>
+        <b>{t("channels.title")}</b>
         <button
           type="button"
           className="p-0 text-primary btn btn-group-vertical"
@@ -55,7 +59,7 @@ const ChannelCreateElement = () => {
 
       <Modal show={showModal} onHide={handleCloseModal}>
         <Modal.Header closeButton>
-          <Modal.Title>Добавить канал</Modal.Title>
+          <Modal.Title>{t("channels.addChannelForm.title")}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Formik
@@ -70,7 +74,9 @@ const ChannelCreateElement = () => {
             {({ isSubmitting, touched, errors }) => (
               <Form>
                 <div className="form-group">
-                  <label htmlFor="name">Имя канала</label>
+                  <label htmlFor="name">
+                    {t("channels.addChannelForm.channelName")}
+                  </label>
                   <Field
                     name="name"
                     type="text"
@@ -91,14 +97,14 @@ const ChannelCreateElement = () => {
                     onClick={handleCloseModal}
                     className="me-2"
                   >
-                    Отменить
+                    {t("formCommonFields.cancel")}
                   </Button>
                   <Button
                     type="submit"
                     variant="primary"
                     disabled={isSubmitting}
                   >
-                    Отправить
+                    {t("formCommonFields.send")}
                   </Button>
                 </div>
               </Form>

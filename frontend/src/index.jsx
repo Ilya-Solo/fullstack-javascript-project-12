@@ -5,13 +5,17 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { Provider } from "react-redux";
 import store from "./slices/store";
+import i18n from "./locales/initializei18";
+import { I18nextProvider } from "react-i18next";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
-    <Provider store={store}>
-      <App />
-    </Provider>
+    <I18nextProvider i18n={i18n} defaultNS={"translation"}>
+      <Provider store={store}>
+        <App />
+      </Provider>
+    </I18nextProvider>
   </React.StrictMode>
 );
 

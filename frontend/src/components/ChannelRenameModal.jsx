@@ -4,6 +4,7 @@ import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
+import { useTranslation } from "react-i18next";
 import { channelUniqnessCheck } from "../slices/channelsSlice";
 
 const ChannelRenameModal = ({
@@ -12,22 +13,25 @@ const ChannelRenameModal = ({
   handleRename,
   initialName,
 }) => {
+  const { t } = useTranslation();
   const channels = useSelector((state) => state.channels);
 
   const validationSchema = Yup.object({
     name: Yup.string()
-      .min(3, "Имя должно содержать не менее 3 символов")
-      .max(20, "Имя должно содержать не более 20 символов")
-      .required("Имя канала обязательно")
-      .test("unique-channel", "Должно быть уникальным", (value) =>
-        channelUniqnessCheck(channels, value),
+      .min(3, t("channels.addChannelForm.errors.wrongUsernameSize"))
+      .max(20, t("channels.addChannelForm.errors.wrongUsernameSize"))
+      .required(t("channels.addChannelForm.errors.channelNameRequired"))
+      .test(
+        "unique-channel",
+        t("channels.addChannelForm.errors.mustBeUniq"),
+        (value) => channelUniqnessCheck(channels, value),
       ),
   });
 
   return (
     <Modal show={show} onHide={handleClose}>
       <Modal.Header closeButton>
-        <Modal.Title>Переименовать канал</Modal.Title>
+        <Modal.Title>{t("channels.renameChannel.title")}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Formik
@@ -58,10 +62,10 @@ const ChannelRenameModal = ({
                   className="me-2"
                   onClick={handleClose}
                 >
-                  Отменить
+                  {t("formCommonFields.cancel")}
                 </Button>
                 <Button type="submit" variant="primary" disabled={isSubmitting}>
-                  Отправить
+                  {t("formCommonFields.send")}
                 </Button>
               </div>
             </Form>
