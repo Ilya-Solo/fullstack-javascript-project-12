@@ -1,4 +1,5 @@
 import React from "react";
+import leoProfanity from "leo-profanity";
 import { useDispatch, useSelector } from "react-redux";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import { ToastContainer, toast } from "react-toastify";
@@ -46,8 +47,15 @@ const ChannelCreateModal = ({ showModal, handleCloseModal }) => {
             initialValues={{ name: "" }}
             validationSchema={validationSchema}
             onSubmit={(values, { setSubmitting }) => {
+              const cleanedChannelName = leoProfanity.clean(values.name);
+
+              if (!channelUniqnessCheck(channels, cleanedChannelName)) {
+                setSubmitting(false);
+                return;
+              }
+
               notify();
-              dispatch(addChannelReqPost({ name: values.name, token }));
+              dispatch(addChannelReqPost({ name: cleanedChannelName, token }));
               setSubmitting(false);
               handleCloseModal();
             }}

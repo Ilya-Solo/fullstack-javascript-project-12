@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import leoProfanity from "leo-profanity";
 import { useDispatch } from "react-redux";
 import Navbar from "../components/Header";
 import ChannelsModule from "../components/ChannelsModule";
@@ -6,10 +7,18 @@ import MessagesModule from "../components/MessagesModule";
 import { connectSocket } from "../slices/messagesSlice";
 import socket from "../slices/initializeSocket";
 
+const loadBadWordsDict = () => {
+  const englishWords = leoProfanity.getDictionary("en");
+  const russianWords = leoProfanity.getDictionary("ru");
+  const combinedWords = [...englishWords, ...russianWords];
+  leoProfanity.add(combinedWords);
+};
+
 const Home = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
+    loadBadWordsDict();
     dispatch(connectSocket());
 
     return () => {

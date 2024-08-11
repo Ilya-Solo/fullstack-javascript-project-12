@@ -3,6 +3,7 @@ import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
+import leoProfanity from "leo-profanity";
 import { addMessageReqPost } from "../slices/messagesSlice";
 import { getChannelsInfo } from "../slices/channelsSlice";
 
@@ -22,9 +23,14 @@ const MessageInput = () => {
         initialValues={{ body: "" }}
         validationSchema={MessageSchema}
         onSubmit={(values, { resetForm }) => {
+          const cleanedValue = {
+            ...values,
+            body: leoProfanity.clean(values.body),
+          };
+          console.log(cleanedValue);
           dispatch(
             addMessageReqPost({
-              ...values,
+              ...cleanedValue,
               channelId: activeChannelId,
               username,
               token,

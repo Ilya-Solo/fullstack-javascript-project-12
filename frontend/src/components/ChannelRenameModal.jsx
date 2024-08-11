@@ -1,4 +1,5 @@
 import React from "react";
+import leoProfanity from "leo-profanity";
 import { useSelector } from "react-redux";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
@@ -43,8 +44,15 @@ const ChannelRenameModal = ({
             initialValues={{ name: initialName }}
             validationSchema={validationSchema}
             onSubmit={(values, { setSubmitting }) => {
+              const cleanedChannelName = leoProfanity.clean(values.name);
+
+              if (!channelUniqnessCheck(channels, cleanedChannelName)) {
+                setSubmitting(false);
+                return;
+              }
+
               notify();
-              handleRename(values.name);
+              handleRename(cleanedChannelName);
               setSubmitting(false);
             }}
           >
